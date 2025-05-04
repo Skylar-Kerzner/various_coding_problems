@@ -70,3 +70,20 @@ data = generate_data(n_samples=10000, ATE=0.5)
 ate = double_ml(data, treatment='T', outcome='y', controls=['X1', 'X2'])
 
 print(f"Estimated Average Treatment Effect (ATE): {ate}")
+
+
+#demonstrate biased estimation
+def biased_model(data, treatment, outcome, controls):
+    X = data[controls].values
+    T = data[treatment].values
+    y = data[outcome].values
+
+    # Split data into training and testing sets
+    X_train, X_test, T_train, T_test, y_train, y_test = train_test_split(X, T, y, test_size=0.2, random_state=42)
+    biased_model = LinearRegression()
+    biased_model.fit(T_train.reshape(-1,1),y_train)
+    biased_estimate = biased_model.coef_[0]
+    return biased_estimate
+
+biased_estimate = biased_model(data, treatment='T', outcome='y', controls=['X1', 'X2'])
+print(f"Incorrect Biased Estimated Average Treatment Effect (ATE): {biased_estimate}")
